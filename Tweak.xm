@@ -50,7 +50,8 @@ the generation of a class list and an automatic constructor.
 
 %hook SBLockScreenManager
 - (void)tapToWakeControllerDidRecognizeWakeGesture:(id)arg1{
-  //%orig;
+  %orig;
+
   //this is where you want to inject the OLED display.
 
   UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Do you want to say hello?"
