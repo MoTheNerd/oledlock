@@ -1,0 +1,10 @@
+Package: com.moom.oledlock
+Name: OLEDLock
+Depends: mobilesubstrate
+Architecture: iphoneos-arm
+Description: Idk here yet tbh
+Maintainer: Mohammad Al-Ahdal
+Author: Mohammad Al-Ahdal
+Section: Tweaks
+Version: 0.0.1-16+debug
+Installed-Size: 120
