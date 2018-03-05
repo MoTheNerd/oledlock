@@ -60,10 +60,3 @@ UIView *topView;
 }
 
 %end
-
-
-%hook SBLockScreenManager
-  - (void)lockScreenViewControllerRequestsUnlock{
-    NSLog(@"shit");
-  }
-%end
