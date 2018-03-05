@@ -32,36 +32,38 @@ the generation of a class list and an automatic constructor.
 // Always make sure you clean up after yourself; Not doing so could have grave consequences!
 %end
 */
+
+#import <UIKit/UIKit.h>
+UIView *topView;
+
+
 %hook SBLockScreenViewControllerBase
+- (void)viewDidLoad{
+  NSLog(@"View is here");
+  topView=[[UIView alloc]initWithFrame:CGRectMake(0, 0, [self view].frame.size.width, [self view].frame.size.height)];
+  [topView setBackgroundColor:[UIColor blackColor]];
+  [[self view] addSubview:topView];
+  [topView release];
+}
 
-  -(void)screenWakeAnimationController:(id)arg1 setRelevantViewsHidden:(_Bool)arg2 forRequester:(id)arg3{
-    NSLog(@"Shit");
-  }
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+  [UIView animateWithDuration:0.3 animations:^{
+      topView.alpha -= 1;
+  }];
+}
 
-  - (void)setInScreenOffMode:(_Bool)arg1{
-    %orig;
-    //you can call other thing here
-    NSLog(@"K, Bye");
-
-  }
+- (void)setInScreenOffMode:(_Bool)arg1{
+  %orig;
+  [UIView animateWithDuration:0.3 animations:^{
+      topView.alpha += 1;
+  }];
+}
 
 %end
 
 
 %hook SBLockScreenManager
-- (void)tapToWakeControllerDidRecognizeWakeGesture:(id)arg1{
-  %orig;
-
-  //this is where you want to inject the OLED display.
-
-  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Do you want to say hello?"
-                                                message:@"More info..."
-                                               delegate:self
-                                      cancelButtonTitle:@"Cancel"
-                                      otherButtonTitles:@"Say Hello",nil];
-[alert show];
-[alert release];
-
-  NSLog(@"HIII");
-}
+  - (void)lockScreenViewControllerRequestsUnlock{
+    NSLog(@"shit");
+  }
 %end
