@@ -1,4 +1,5 @@
 include $(THEOS)/makefiles/common.mk
+include $(THEOS_MAKE_PATH)/aggregate.mk
 
 TWEAK_NAME = OLEDLock
 OLEDLock_FILES = Tweak.xm

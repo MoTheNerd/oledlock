@@ -34,47 +34,66 @@ the generation of a class list and an automatic constructor.
 */
 
 #import <UIKit/UIKit.h>
-UIView *topView;
 
+
+
+#import <Foundation/Foundation.h>
+#import <substrate.h>
+
+UIView *topView = NULL;
 
 %hook SBLockScreenViewControllerBase
 - (void)viewDidLoad{
 
   if (topView == NULL){
-    NSLog(@"View is here");
-    topView=[[UIView alloc]initWithFrame:CGRectMake(0, 0, [self view].frame.size.width, [self view].frame.size.height)];
-    [topView setBackgroundColor:[UIColor blackColor]];
-    [[self view] addSubview:topView];
+    %orig; //execute orig
+    NSLog(@"OLEDLOCK! View is here"); //NSLog for checking if tweak loaded
+
+    //Create the black view and add it
+    topView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, [self view].frame.size.width, [self view].frame.size.height)];
+    [topView setBackgroundColor: [UIColor blackColor]];
+    [[self view] addSubview: topView];
     [topView release];
+
+
+  //check for else (unlikely but there for a reason).
   }else{
-    topView.alpha = 1;
+    //fast set alpha to 1
+      topView.alpha = 1;
   }
 }
-
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-  [UIView animateWithDuration:0.3 animations:^{
+  [UIView animateWithDuration:0.7 animations:^{
       topView.alpha = 0;
   }];
-}
 
-- (void)updateStatusBarForLockScreenComeback{
-  %orig;
-
-  [UIView animateWithDuration:0.3 animations:^{
-      // gotta make sure we don't go over 1
-      topView.alpha = 1;
-  }];
+  
 }
 
 %end
 
 %hook SBBacklightController
-
-
 - (void)turnOnScreenFullyWithBacklightSource:(long long)arg1{
   %orig;
   topView.alpha = 1;
 
-}
 
+}
+%end
+
+%hook SBLockStateAggregator
+unsigned long long lstate = 3; // define dummy var same name and then perform MSHOOKIvar<type>(self, "nameOfVar");
+- (void)_updateLockState{//_updateLockState is called multiple times during unlock
+
+  lstate = MSHookIvar<unsigned long long>(self, "_lockState");
+  //You get valid lockState
+  %orig;
+  NSLog(@"OLEDLOCK!  lockState: %llu", lstate);
+
+  if (lstate == 1 || lstate == 0){
+    [UIView animateWithDuration:0.7 animations:^{
+        topView.alpha = 0;
+    }];
+  }
+}
 %end
