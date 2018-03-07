@@ -41,33 +41,36 @@ the generation of a class list and an automatic constructor.
 #import <substrate.h>
 
 UIView *topView = NULL;
+UIViewController *sblsvcb;
 
-%hook SBLockScreenViewControllerBase
+
+
+//%hook SBDashBoardCombinedListViewController
+//SBDashBoardQuickActionsViewController
+%hook SBLockScreenManager
+//SBDashBoardViewControllerBase
+//SBDashBoardWallpaperEffectView
 - (void)viewDidLoad{
 
-  if (topView == NULL){
     %orig; //execute orig
     NSLog(@"OLEDLOCK! View is here"); //NSLog for checking if tweak loaded
+
+
+    sblsvcb = MSHookIvar<UIViewController *>(self, "_lockScreenViewController");
 
     //Create the black view and add it
     topView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, [self view].frame.size.width, [self view].frame.size.height)];
     [topView setBackgroundColor: [UIColor blackColor]];
     [[self view] addSubview: topView];
-    [topView release];
-
-
-  //check for else (unlikely but there for a reason).
-  }else{
-    //fast set alpha to 1
-      topView.alpha = 1;
-  }
+    //[[sblsvcb view] addSubview: topView];
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
   [UIView animateWithDuration:0.7 animations:^{
+      NSLog(@"OLEDLOCK!  TOUCHIE");
       topView.alpha = 0;
   }];
+  //[topView.superview.subviews[0] removeFromSuperview];
 
-  
 }
 
 %end
@@ -76,8 +79,6 @@ UIView *topView = NULL;
 - (void)turnOnScreenFullyWithBacklightSource:(long long)arg1{
   %orig;
   topView.alpha = 1;
-
-
 }
 %end
 
