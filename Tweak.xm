@@ -34,6 +34,9 @@ the generation of a class list and an automatic constructor.
 */
 
 #import <UIKit/UIKit.h>
+#include <SpringBoard/SpringBoard.h>
+#import <SpringBoard/SpringBoard.h>
+#import <SpringBoard/SBLockScreenViewController.h>
 
 
 
@@ -41,38 +44,37 @@ the generation of a class list and an automatic constructor.
 #import <substrate.h>
 
 UIView *topView = NULL;
-UIViewController *sblsvcb;
 
 
 
-//%hook SBDashBoardCombinedListViewController
-//SBDashBoardQuickActionsViewController
 %hook SBLockScreenManager
-//SBDashBoardViewControllerBase
-//SBDashBoardWallpaperEffectView
-- (void)viewDidLoad{
+
+SBLockScreenViewController *sblsvcb = NULL;
+- (void)loadViewsIfNeeded{
 
     %orig; //execute orig
     NSLog(@"OLEDLOCK! View is here"); //NSLog for checking if tweak loaded
 
 
-    sblsvcb = MSHookIvar<UIViewController *>(self, "_lockScreenViewController");
-
+    sblsvcb = MSHookIvar<SBLockScreenViewController *>(self, "_lockScreenViewController");
+    NSLog(@"OLEDLOCK! %@", sblsvcb);
     //Create the black view and add it
-    topView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, [self view].frame.size.width, [self view].frame.size.height)];
+    topView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, [sblsvcb view].frame.size.width, [sblsvcb view].frame.size.height)];
     [topView setBackgroundColor: [UIColor blackColor]];
-    [[self view] addSubview: topView];
-    //[[sblsvcb view] addSubview: topView];
+    [[sblsvcb view] addSubview: topView];
+    [[sblsvcb view] bringSubviewToFront: topView];
+    topView.layer.zPosition = 100000;
 }
+
+%end
+
+%hook SBLockScreenViewControllerBase
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
   [UIView animateWithDuration:0.7 animations:^{
       NSLog(@"OLEDLOCK!  TOUCHIE");
       topView.alpha = 0;
   }];
-  //[topView.superview.subviews[0] removeFromSuperview];
-
 }
-
 %end
 
 %hook SBBacklightController
@@ -98,3 +100,8 @@ unsigned long long lstate = 3; // define dummy var same name and then perform MS
   }
 }
 %end
+
+%hook SBStatusBarManager {
+  
+
+}
