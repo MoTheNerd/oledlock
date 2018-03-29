@@ -11,4 +11,6 @@
 ### What can we expect in the future?
 > Further Development on this tweak! I'm hoping to release it by sometime in June but it's going to be a long and hard journey remembering I'm still pretty new at this stuff.
 ### What if I wanna work on this?
-> You have two options, 1. Fork this repository and start working it on your own time 2. Email me at mohammad@enggmomo.me if you wanna do a colab :fire:
+> You have two options, 
+> 1. Fork this repository and start working it on your own time 
+> 2. Email me at mohammad@enggmomo.me if you wanna do a colab :fire:
