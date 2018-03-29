@@ -39,69 +39,59 @@ the generation of a class list and an automatic constructor.
 #import <SpringBoard/SBLockScreenViewController.h>
 
 
-
 #import <Foundation/Foundation.h>
 #import <substrate.h>
 
-UIView *topView = NULL;
+@interface HaloController : NSObject
 
+@property(nonatomic, retain) UIWindow *window;
+
++ (instancetype)sharedInstance;
+
+- (void)show:(BOOL)show animated:(BOOL)animated;
+
+@end
+
+UIWindow *window;
+HaloController *controller;
 
 
 %hook SBLockScreenManager
-
-SBLockScreenViewController *sblsvcb = NULL;
 - (void)loadViewsIfNeeded{
 
     %orig; //execute orig
-    NSLog(@"OLEDLOCK! View is here"); //NSLog for checking if tweak loaded
-
-
-    sblsvcb = MSHookIvar<SBLockScreenViewController *>(self, "_lockScreenViewController");
-    NSLog(@"OLEDLOCK! %@", sblsvcb);
-    //Create the black view and add it
-    topView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, [sblsvcb view].frame.size.width, [sblsvcb view].frame.size.height)];
-    [topView setBackgroundColor: [UIColor blackColor]];
-    [[sblsvcb view] addSubview: topView];
-    [[sblsvcb view] bringSubviewToFront: topView];
-    topView.layer.zPosition = 100000;
-}
-
-%end
-
-%hook SBLockScreenViewControllerBase
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-  [UIView animateWithDuration:0.7 animations:^{
-      NSLog(@"OLEDLOCK!  TOUCHIE");
-      topView.alpha = 0;
-  }];
+    window = [[%c(HaloController) sharedInstance] window];
+    // NSLog(@"OLEDLOCK! %@", window);
 }
 %end
 
 %hook SBBacklightController
 - (void)turnOnScreenFullyWithBacklightSource:(long long)arg1{
+  NSLog(@"OLEDLOCK!    window hiddin status is: %d", window.hidden);
+  // dispatch_async(dispatch_get_main_queue(), ^{ 
+  //   controller = [%c(HaloController) sharedInstance];
+  //   [controller show:YES animated:YES];
+  //   NSLog(@"OLEDLOCK! %@", window);
+    
+    
+  // });
   %orig;
-  topView.alpha = 1;
 }
 %end
 
-%hook SBLockStateAggregator
-unsigned long long lstate = 3; // define dummy var same name and then perform MSHOOKIvar<type>(self, "nameOfVar");
-- (void)_updateLockState{//_updateLockState is called multiple times during unlock
+// %hook SBLockStateAggregator
+// unsigned long long lstate = 3; // define dummy var same name and then perform MSHOOKIvar<type>(self, "nameOfVar");
+// - (void)_updateLockState{//_updateLockState is called multiple times during unlock
 
-  lstate = MSHookIvar<unsigned long long>(self, "_lockState");
-  //You get valid lockState
-  %orig;
-  NSLog(@"OLEDLOCK!  lockState: %llu", lstate);
+//   lstate = MSHookIvar<unsigned long long>(self, "_lockState");
+//   //You get valid lockState
+//   %orig;
+//   NSLog(@"OLEDLOCK!  lockState: %llu", lstate);
 
-  if (lstate == 1 || lstate == 0){
-    [UIView animateWithDuration:0.7 animations:^{
-        topView.alpha = 0;
-    }];
-  }
-}
-%end
-
-%hook SBStatusBarManager {
-  
-
-}
+//   if (lstate == 1 || lstate == 0){
+//     [UIView animateWithDuration:0.7 animations:^{
+        
+//     }];
+//   }
+// }
+// %end
