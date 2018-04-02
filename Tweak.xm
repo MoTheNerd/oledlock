@@ -67,7 +67,9 @@ HaloController *controller;
 
 %hook SBBacklightController
 - (void)turnOnScreenFullyWithBacklightSource:(long long)arg1{
-  NSLog(@"OLEDLOCK!    window hiddin status is: %d", window.hidden);
+  %orig;
+  [controller show:YES animated:YES];
+  NSLog(@"OLEDLOCK!Backlight    window hiddin status is: %d", window.hidden);
   // dispatch_async(dispatch_get_main_queue(), ^{ 
   //   controller = [%c(HaloController) sharedInstance];
   //   [controller show:YES animated:YES];
@@ -75,7 +77,21 @@ HaloController *controller;
     
     
   // });
+}
+%end
+
+%hook SBLockHardwareButtonActions
+- (void)performSinglePressAction{
   %orig;
+  [controller show:YES animated:YES];
+  NSLog(@"OLEDLOCK!Button    window hiddin status is: %d", window.hidden);
+  // dispatch_async(dispatch_get_main_queue(), ^{ 
+  //   controller = [%c(HaloController) sharedInstance];
+  //   [controller show:YES animated:YES];
+  //   NSLog(@"OLEDLOCK! %@", window);
+    
+    
+  // });
 }
 %end
 
